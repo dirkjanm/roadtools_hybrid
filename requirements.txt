@@ -1,0 +1,4 @@
+cryptography
+impacket
+ldap3
+pyasn1
