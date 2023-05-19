@@ -9,7 +9,7 @@ import codecs
 import base64
 
 def saveTicket(ticket, sessionKey):
-    logging.info('Saving ticket in %s' % ('roadtx.ccache'))
+    print('Saving ticket in %s' % ('roadtx.ccache'))
     ccache = CCache()
 
     ccache.fromTGT(ticket, sessionKey, sessionKey)
@@ -24,7 +24,7 @@ try:
 except KeyError:
     sessionkey = base64.b64decode(ticketdata['clientKey'])
 asRep = decoder.decode(ticketbin, asn1Spec=AS_REP())[0]
-print(asRep)
+# print(asRep)
 cipher = _enctype_table[18]
 key = Key(18, sessionkey)
 cipherText = asRep['enc-part']['cipher']
@@ -38,7 +38,7 @@ except InvalidChecksum as e:
         raise SessionKeyDecryptionError(error_msg, asRep, cipher, key, cipherText)
     raise
 encASRepPart = decoder.decode(plainText, asn1Spec = EncASRepPart())[0]
-print(encASRepPart)
+# print(encASRepPart)
 
 cipher = _enctype_table[encASRepPart['key']['keytype']]
 sessionKey = Key(cipher.enctype,encASRepPart['key']['keyvalue'].asOctets())
