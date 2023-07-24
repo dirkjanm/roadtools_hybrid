@@ -107,9 +107,9 @@ def main():
         except FileNotFoundError:
             logging.error('No auth data found. Ether supply an access token with --access-token or make sure a token is present on disk in .roadtools_auth')
             return
-    if tokendata['aud'] != 'https://graph.windows.net/':
-        logging.error(f"Wrong token audience, got {tokendata['aud']} but expected: https://graph.windows.net/")
-        logging.error("Make sure to request a token with -r https://graph.windows.net/")
+    if tokendata['aud'] != 'https://graph.windows.net' and tokendata['aud'] != 'https://graph.windows.net/':
+        logging.error(f"Wrong token audience, got {tokendata['aud']} but expected: https://graph.windows.net")
+        logging.error("Make sure to request a token with -r https://graph.windows.net")
         return
 
     if not args.sourceanchor:
