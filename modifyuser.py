@@ -4,6 +4,7 @@ from lib.wcf.records import dump_records
 from io import BytesIO
 from roadtools.roadlib.auth import Authentication, get_data, WELLKNOWN_CLIENTS, WELLKNOWN_RESOURCES
 from impacket.ldap.ldaptypes import LDAP_SID
+import xml.etree.ElementTree as ET
 import base64
 import sys
 import logging
