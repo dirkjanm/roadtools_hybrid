@@ -42,3 +42,13 @@ Example:
 roadtx gettokens -u myadminuser@mytenant.com -p somepassword -r aadgraph
 python modifyuser.py -a aec/Es9Xe0CmrjyOUxUH/g== -sid S-1-5-21-1414223725-1888795230-1473887622-1108 -sam newsamname
 ```
+
+## krbsso.py
+
+This tool takes a Kerberos Service Ticket from a ccache file and converts this into the SPNEGO structure that can be used to authenticate in HTTP flows needed for the Azure AD Seamless Single Sign On feature. Note that since this is time based authentication, the resulting blob should be used within a few minutes of it being requested, and your clock should be set correctly.
+
+Example, requiring a service ticket to be in the `test.ccache` file, which you could request or generate with impacket:
+
+```
+krbsso.py test.ccache
+```
