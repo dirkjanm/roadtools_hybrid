@@ -4,7 +4,7 @@ This repository contains some complementary utilities for ROADtools that interac
 
 # Install
 
-Clone the repository locally, then use `pip install -r requirements.txt` to install the requirements. If using Python 3.10, you may also need the `pycryptodome` package.
+Clone the repository locally, then use `pip install -r requirements.txt` to install the requirements. If using Python 3.10 or newer, you may also need the `pycryptodome` package.
 
 # Tools
 
