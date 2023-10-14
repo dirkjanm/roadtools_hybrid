@@ -227,7 +227,6 @@ def main():
             datetime.datetime.utcnow() + datetime.timedelta(days=3650)
         ).sign(key, hashes.SHA256())
 
-        operation = ldap3.MODIFY_REPLACE
         # Write our certificate out to disk.
         
         print_m(f'Saving certificate key to {certout}')
@@ -237,6 +236,8 @@ def main():
         # Use binary data for writing to object
         certdata = cert.public_bytes(serialization.Encoding.DER)
 
+    operation = ldap3.MODIFY_REPLACE
+    
     if args.clear:
         print_o('Printing object before clearing')
         print(targetobject)
