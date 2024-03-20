@@ -64,6 +64,7 @@ def main():
     parser.add_argument("-p", "--password", metavar='PASSWORD', help="Password or LM:NTLM hash, will prompt if not specified")
     parser.add_argument("-t", "--target", metavar='TARGET', help="Computername or username to target (FQDN or COMPUTER$ name, if unspecified user with -u is target)")
     parser.add_argument("-T", "--target-type", metavar='TARGETTYPE', choices=('samname','hostname','auto'), default='auto', help="Target type (samname or hostname) If unspecified, will assume it's a hostname if there is a . in the name and a SAM name otherwise.")
+    parser.add_argument("-cert", metavar='CERT', help="Certificate in PEM format to set.")
     parser.add_argument("-r", "--overwrite", action='store_true', help="Overwrite an existing certificate")
     parser.add_argument("-c", "--clear", action='store_true', help="Clear, i.e. remove all certs")
     parser.add_argument("-q", "--query", action='store_true', help="Show the current target certs instead of modifying anything")
@@ -182,60 +183,74 @@ def main():
             if not args.overwrite:
                 print('Certificate exists, use --overwrite to force overwriting')
                 return
-        if targetuser[-1] == '$':
-            outfile = targetuser[:-1]
+            
+        if args.cert:
+            try:
+                with open(args.cert, "rb") as certf:
+                    cert = x509.load_pem_x509_certificate(certf.read())
+                certdata = cert.public_bytes(serialization.Encoding.DER)
+            except FileNotFoundError:
+                print_f(f"Invalid file path: {args.cert}")
+                sys.exit(1)
+            except ValueError:
+                print_f(f"Error while loading {args.cert}, the certificate must be in PEM format.")
+                sys.exit(1)
+
         else:
-            outfile = targetuser
-        privout = f"{outfile}.key"
-        certout = f"{outfile}.pem"
-        # Create self-signed cert
-        # Generate our key
-        key = rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=2048,
-        )
-        # Write device key to disk
-        print_m(f'Saving private key to {privout}')
-        with open(privout, "wb") as keyf:
-            keyf.write(key.private_bytes(
-                encoding=serialization.Encoding.PEM,
-                format=serialization.PrivateFormat.TraditionalOpenSSL,
-                encryption_algorithm=serialization.NoEncryption(),
-            ))
+            if targetuser[-1] == '$':
+                outfile = targetuser[:-1]
+            else:
+                outfile = targetuser
+            privout = f"{outfile}.key"
+            certout = f"{outfile}.pem"
+            # Create self-signed cert
+            # Generate our key
+            key = rsa.generate_private_key(
+                public_exponent=65537,
+                key_size=2048,
+            )
+            # Write device key to disk
+            print_m(f'Saving private key to {privout}')
+            with open(privout, "wb") as keyf:
+                keyf.write(key.private_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PrivateFormat.TraditionalOpenSSL,
+                    encryption_algorithm=serialization.NoEncryption(),
+                ))
 
-        # Generate a self-signed cert
-        guid = str(targetobject.objectGUID)[1:-1]
-        objectsid = str(targetobject.objectSid)
-        print_m(f"Device ID: {guid}")
-        print_m(f"Device SID: {objectsid}")
-        subject = issuer = x509.Name([
-            x509.NameAttribute(NameOID.COMMON_NAME, guid),
-        ])
+            # Generate a self-signed cert
+            guid = str(targetobject.objectGUID)[1:-1]
+            objectsid = str(targetobject.objectSid)
+            print_m(f"Device ID: {guid}")
+            print_m(f"Device SID: {objectsid}")
+            subject = issuer = x509.Name([
+                x509.NameAttribute(NameOID.COMMON_NAME, guid),
+            ])
 
-        cert = x509.CertificateBuilder().subject_name(
-            subject
-        ).issuer_name(
-            issuer
-        ).public_key(
-            key.public_key()
-        ).serial_number(
-            x509.random_serial_number()
-        ).not_valid_before(
-            datetime.datetime.utcnow()
-        ).not_valid_after(
-            # Our certificate will be valid for 10 years
-            datetime.datetime.utcnow() + datetime.timedelta(days=3650)
-        ).sign(key, hashes.SHA256())
+            cert = x509.CertificateBuilder().subject_name(
+                subject
+            ).issuer_name(
+                issuer
+            ).public_key(
+                key.public_key()
+            ).serial_number(
+                x509.random_serial_number()
+            ).not_valid_before(
+                datetime.datetime.utcnow()
+            ).not_valid_after(
+                # Our certificate will be valid for 10 years
+                datetime.datetime.utcnow() + datetime.timedelta(days=3650)
+            ).sign(key, hashes.SHA256())
 
-        # Write our certificate out to disk.
+            # Write our certificate out to disk.
+            
+            print_m(f'Saving certificate key to {certout}')
+            with open(certout, "wb") as f:
+                f.write(cert.public_bytes(serialization.Encoding.PEM))
+
+            # Use binary data for writing to object
+            certdata = cert.public_bytes(serialization.Encoding.DER)
         
-        print_m(f'Saving certificate key to {certout}')
-        with open(certout, "wb") as f:
-            f.write(cert.public_bytes(serialization.Encoding.PEM))
-
-        # Use binary data for writing to object
-        certdata = cert.public_bytes(serialization.Encoding.DER)
-
     operation = ldap3.MODIFY_REPLACE
     
     if args.clear:
@@ -254,7 +269,6 @@ def main():
             print_f('Could not modify object, the server reports a constrained violation')
         else:
             print_f('The server returned an error: %s' % c.result['message'])
-
 
 if __name__ == '__main__':
     main()
