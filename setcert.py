@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ####################
 #
-# Copyright (c) 2022 Dirk-jan Mollema (@_dirkjan)
+# Copyright (c) 2024 Dirk-jan Mollema (@_dirkjan)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -94,7 +94,7 @@ def main():
         TGS = None
         try:
             # Hashes
-            lmhash, nthash = password.split(':')
+            lmhash, nthash = args.password.split(':')
             assert len(nthash) == 32
             password = ''
         except:
@@ -107,7 +107,7 @@ def main():
         if args.dc_ip is None:
             kdcHost = domain
         else:
-            kdcHost = options.dc_ip
+            kdcHost = args.dc_ip
         userName = Principal(user, type=constants.PrincipalNameType.NT_PRINCIPAL.value)
         if not TGT and not TGS:
             if not args.password and not nthash:
@@ -128,7 +128,6 @@ def main():
         authentication = SASL
         sasl_mech = KERBEROS
 
-    controls = security_descriptor_control(sdflags=0x04)
     # define the server and the connection
     s = Server(args.host, get_info=ALL)
     print_m('Connecting to host...')
@@ -158,6 +157,8 @@ def main():
         print_f('Service configuration point not found, unable to look up tenant ID. This domain may not be configured for hybrid join!')
 
     targetuser = args.target
+    if not targetuser:
+        targetuser = user
 
     if ('.' in targetuser and args.target_type != 'samname') or args.target_type == 'hostname':
         if args.target_type == 'auto':
@@ -183,7 +184,7 @@ def main():
             if not args.overwrite:
                 print('Certificate exists, use --overwrite to force overwriting')
                 return
-            
+
         if args.cert:
             try:
                 with open(args.cert, "rb") as certf:
