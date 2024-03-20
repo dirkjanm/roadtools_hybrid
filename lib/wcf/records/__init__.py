@@ -61,7 +61,11 @@ def print_records(records, skip=0, fp=None, first_call=True):
         if isinstance(r, Element):
             fp.write(('\n' if not first_call else '') + ' ' * skip + str(r))
         else:
-            fp.write(str(r))
+            # Try escaped variant for text first
+            try:
+                fp.write(r.escaped())
+            except AttributeError:
+                fp.write(str(r))
        
         new_line = False
         if hasattr(r, 'childs'):

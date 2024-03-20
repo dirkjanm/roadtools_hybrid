@@ -29,6 +29,7 @@
 from __future__ import absolute_import, unicode_literals, division
 
 from builtins import str, chr, bytes, int
+from lib.utils.xml import xmlesc
 
 import struct
 import base64
@@ -288,6 +289,9 @@ class UnicodeChars8TextRecord(Text):
         'abc'
         """
         return self.value
+
+    def escaped(self):
+        return xmlesc(self.value)
 
     @classmethod
     def parse(cls, fp):
@@ -586,6 +590,9 @@ class Chars8TextRecord(Text):
         "a&lt;b&gt;c&gt;&gt;&amp;'&quot;"
         """
         return self.value
+
+    def escaped(self):
+        return xmlesc(self.value)
 
     def to_bytes(self):
         r"""
