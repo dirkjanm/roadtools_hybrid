@@ -22,6 +22,10 @@ python setcert.py 10.0.1.1 -t 'DESKTOP-NAME$' -u 'domain\DESKTOP-NAME$' -p compu
 
 This tool can extract a partial Kerberos TGT from a roadtx `.prt` file and save it in a ccache for use with tools such as impacket. Only useful if the `.tgt` file actually includes a TGT for on-prem.
 
+## loadticketcloud.py
+
+This tool can extract an Entra Kerberos TGT from a roadtx `.prt` file and save it in `tgt_cloud.ccache`. This TGT can be used to request TGS for accessing Azure file shares using Kerberos authentication.
+
 ## partialtofulltgt.py
 
 This tool takes a partial TGT from either a ccache (extracted using loadticket.py) or from a `.prt` file directly, and upgrades this to a full TGT. It will also recover the NT hash of this account via the KRB KEY LIST feature.
