@@ -52,3 +52,14 @@ Example, requiring a service ticket to be in the `test.ccache` file, which you c
 ```
 krbsso.py test.ccache
 ```
+
+## setsyncuserpassword.py
+
+This tool uses the Synchronization API used by Azure AD Connect to set the password on synchronized accounts (accounts with source AD in roadrecon). It will not work on cloud-only accounts. You'll need a Global Admin account or Sync account token to use this tool.
+
+Example:
+
+```
+roadtx gettokens -u myadminuser@mytenant.com -p somepassword -r aadgraph
+python setsyncuserpassword.py -a aec/Es9Xe0CmrjyOUxUH/g== -p 'PasswordGoesHere'
+```
