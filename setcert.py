@@ -59,7 +59,7 @@ def main():
     parser._positionals.title = "Required options"
 
     #Main parameters
-    parser.add_argument("host", metavar='HOSTNAME', help="Hostname/ip or ldap://host:port connection string to connect to")
+    parser.add_argument("ldaphost", metavar='HOSTNAME', help="Hostname/ip or ldap://host:port connection string to connect to")
     parser.add_argument("-u", "--user", metavar='USERNAME', help="DOMAIN\\username for authentication")
     parser.add_argument("-p", "--password", metavar='PASSWORD', help="Password or LM:NTLM hash, will prompt if not specified")
     parser.add_argument("-t", "--target", metavar='TARGET', help="Computername or username to target (FQDN or COMPUTER$ name, if unspecified user with -u is target)")
@@ -179,7 +179,12 @@ def main():
         # If we only want to query it
         print(targetobject)
         return
-    if not args.clear:
+
+    if args.clear:
+        print_o('Printing object before clearing')
+        print(targetobject)
+        c.modify(targetobject.entry_dn, {'userCertificate':[(ldap3.MODIFY_REPLACE, [])]})
+    else:
         if len(targetobject.usercertificate) > 0:
             if not args.overwrite:
                 print('Certificate exists, use --overwrite to force overwriting')
@@ -251,15 +256,8 @@ def main():
 
             # Use binary data for writing to object
             certdata = cert.public_bytes(serialization.Encoding.DER)
-        
-    operation = ldap3.MODIFY_REPLACE
-    
-    if args.clear:
-        print_o('Printing object before clearing')
-        print(targetobject)
-        c.modify(targetobject.entry_dn, {'userCertificate':[(operation, [])]})
-    else:
-        c.modify(targetobject.entry_dn, {'userCertificate':[(operation, [certdata])]})
+            c.modify(targetobject.entry_dn, {'userCertificate':[(ldap3.MODIFY_REPLACE, [certdata])]})
+
 
     if c.result['result'] == 0:
         print_o('Certificate Modified successfully')
