@@ -59,7 +59,7 @@ def main():
     parser._positionals.title = "Required options"
 
     #Main parameters
-    parser.add_argument("ldaphost", metavar='HOSTNAME', help="Hostname/ip or ldap://host:port connection string to connect to")
+    parser.add_argument("host", metavar='HOSTNAME', help="Hostname/ip or ldap://host:port connection string to connect to")
     parser.add_argument("-u", "--user", metavar='USERNAME', help="DOMAIN\\username for authentication")
     parser.add_argument("-p", "--password", metavar='PASSWORD', help="Password or LM:NTLM hash, will prompt if not specified")
     parser.add_argument("-t", "--target", metavar='TARGET', help="Computername or username to target (FQDN or COMPUTER$ name, if unspecified user with -u is target)")
