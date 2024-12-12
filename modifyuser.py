@@ -131,6 +131,8 @@ def main():
         props.append(PROPS_TEMPLATE['onPremisesSamAccountName'].format(propvalue=args.samaccountname))
     if args.userprincipalname:
         props.append(PROPS_TEMPLATE['userPrincipalName'].format(propvalue=args.userprincipalname))
+    if args.accountenabled:
+        props.append(PROPS_TEMPLATE['accountEnabled'].format(propvalue=str(args.accountenabled)))
 
     propstring = '\n'.join(props)
 
