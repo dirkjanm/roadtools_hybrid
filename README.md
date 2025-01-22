@@ -67,3 +67,14 @@ Example:
 roadtx gettokens -u myadminuser@mytenant.com -p somepassword -r aadgraph
 python setsyncuserpassword.py -a aec/Es9Xe0CmrjyOUxUH/g== -p 'PasswordGoesHere'
 ```
+
+## createsynaccount.py
+
+This tool uses the Synchronization API used by Azure AD Connect to create a new Synchronization Account. You'll need a Global Admin account or (untested) Hybrid Identity administrator to run this.
+
+Example:
+
+```
+roadtx gettokens -u myadminuser@mytenant.com -p somepassword -r aadgraph
+python createsynaccount.py -i Sync_AADCONNECTSERVER_RANDOMGUID
+```
