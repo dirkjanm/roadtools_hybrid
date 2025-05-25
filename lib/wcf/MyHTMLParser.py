@@ -52,7 +52,7 @@ locatestarttagend = re.compile(r"""
   \s*                                # trailing whitespace
 """, re.VERBOSE)
 endendtag = re.compile('>')
-endtagfind = re.compile('</\s*([a-zA-Z][-.a-zA-Z0-9:_]*)\s*>')
+endtagfind = re.compile(r'</\s*([a-zA-Z][-.a-zA-Z0-9:_]*)\s*>')
 
 
 class HTMLParseError(Exception):

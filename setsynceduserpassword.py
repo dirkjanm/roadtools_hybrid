@@ -92,7 +92,7 @@ def main():
             logging.error('No auth data found. Ether supply an access token with --access-token or make sure a token is present on disk in .roadtools_auth')
             return
 
-    if tokendata['aud'] != 'https://graph.windows.net' and tokendata['aud'] != 'https://graph.windows.net/':
+    if tokendata['aud'] not in ('https://graph.windows.net', 'https://graph.windows.net/', '6bf85cfa-ac8a-4be5-b5de-425a0d0dc016', '00000002-0000-0000-c000-000000000000'):
         logging.error(f"Wrong token audience, got {tokendata['aud']} but expected: https://graph.windows.net")
         logging.error("Make sure to request a token with -r https://graph.windows.net")
         return
@@ -113,10 +113,10 @@ def main():
     inputhash = nthash.upper().encode('utf-16-le')
     salt = os.urandom(16)
     kdf = PBKDF2HMAC(
-            algorithm=hashes.SHA256(),
-            length=32,
-            salt=salt,
-            iterations=1000,
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=1000,
     )
     outputhash = binascii.hexlify(kdf.derive(inputhash)).decode('utf-8')
     logging.debug('PPH1_MD4 hash: %s', outputhash)
@@ -182,7 +182,7 @@ Expect: 100-continue'''
         logging.error(els[0].text)
     else:
         els = tree.find('.//{http://schemas.datacontract.org/2004/07/Microsoft.Online.Coexistence.Schema}SyncCredentialsChangeResult')
-        if els:
+        if els is not None:
             result = els.find('{http://schemas.datacontract.org/2004/07/Microsoft.Online.Coexistence.Schema}Result')
             if result is not None:
                 resultcode = int(result.text)

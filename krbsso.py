@@ -71,7 +71,7 @@ def build_auth(ccache):
     clientName.from_asn1( tgs, 'crealm', 'cname')
 
     seq_set(authenticator, 'cname', clientName.components_to_asn1)
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now(datetime.timezone.utc)
 
     authenticator['cusec'] = now.microsecond
     authenticator['ctime'] = KerberosTime.to_asn1(now)
